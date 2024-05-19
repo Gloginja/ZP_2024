@@ -1,16 +1,13 @@
-# This is a sample Python script.
+from keyRing.privateKeyRing import PrivateKeyRing
+import rsa
+import user
+from datetime import datetime
+pr, pu = rsa.newkeys(1024)
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+pkr = PrivateKeyRing()
+gloginja = user.User('amarko00@hotmail.com','gloginja99','Marko')
+user.users.append(gloginja)
+pkr.addToRing(datetime.now(), pr, pu, gloginja.email)
+pr1 = pkr.getPR(pu.n % 2 ** 64, 'gloginja99')
+pass
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
