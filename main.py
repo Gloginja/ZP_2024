@@ -1,16 +1,11 @@
-# This is a sample Python script.
+from keyRing.keyRingManager import KeyRingManager
+import rsa
+from user import User, users
+pu, pr = rsa.newkeys(1024)
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+manager = KeyRingManager()
+gloginja = User('amarko00@hotmail.com','gloginja99','Marko')
+users.append(gloginja)
+manager.generateNewPairRSA(1024, 'amarko00@hotmail.com', 'gloginja99')
+pass
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
