@@ -10,7 +10,7 @@ class User:
         self.email = email
         self.password = hashPass(password)
 
-    def checkPassword(self, password):
+    def checkPassword(self, password) -> bool:
         return self.password == hashPass(password)
 
 

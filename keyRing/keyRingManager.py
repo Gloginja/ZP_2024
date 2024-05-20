@@ -27,3 +27,15 @@ class KeyRingManager:
 
     def getPR(self, keyID: int, password: str):
         return self.privateKeyRing.getPR(keyID=keyID, password=password)
+
+    def deleteKeyPairByPUID(self, keyID: int, userID: str, password: str):
+        user = getUserDataByEmail(userID)
+        if user is not None:
+            if user.checkPassword(password=password):
+                self.privateKeyRing.deleteKey(keyID, userID)
+                self.publicKeyRing.deleteKey(keyID, userID)
+            else:
+                pass  # todo
+        else:
+            pass  # todo
+

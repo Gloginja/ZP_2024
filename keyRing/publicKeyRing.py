@@ -15,3 +15,10 @@ class PublicKeyRing:
             if k['keyID'] == keyID:
                 return k['PU']
         return None
+
+    def deleteKey(self, keyID: int, userID: str) -> bool:
+        for k in self.keyRing:
+            if k['keyID'] == keyID and k['userID'] == userID:
+                self.keyRing.remove(k)
+                return True
+        return False
