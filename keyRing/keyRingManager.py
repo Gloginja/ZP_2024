@@ -1,3 +1,5 @@
+import os
+
 from keyRing.privateKeyRing import PrivateKeyRing
 from keyRing.publicKeyRing import PublicKeyRing
 from user import getUserDataByEmail
@@ -49,7 +51,7 @@ class KeyRingManager:
         self.privateKeyRing = PrivateKeyRing()
         self.publicKeyRing = PublicKeyRing()
 
-    def generateNewPairRSA(self, keySize: int, userID: str, password: str) -> int | None:
+    def generateNewPairRSA(self, keySize: int, userID: str, password: str, save_option: int ) -> int | None:
         user = getUserDataByEmail(userID)
         if user is not None:
             if user.checkPassword(password=password):
@@ -57,13 +59,60 @@ class KeyRingManager:
                 pu = pr.public_key()
                 self.publicKeyRing.addToRing(datetime.datetime.now(), pu, userID)
                 self.privateKeyRing.addToRing(datetime.datetime.now(), pu, pr, userID)
-                return pu.n % 2 ** 64
+                keyId = pu.n % 2 ** 64
+                if save_option == 1:
+                    self.publicKeyRing.addToRing(datetime.datetime.now(), pu, userID)
+                    public_key_pem = pu.export_key()
+                    with open(f"{userID}_public_key_{keyId}.pem", "wb") as f:
+                        f.write(public_key_pem)
+                elif save_option == 2:
+                    self.publicKeyRing.addToRing(datetime.datetime.now(), pu, userID)
+                    self.privateKeyRing.addToRing(datetime.datetime.now(), pu, pr, userID)
+
+                    private_key_pem = pr.export_key()
+                    public_key_pem = pu.export_key()
+
+                    with open(f"{userID}_private_key_{keyId}.pem", "wb") as f:
+                        f.write(private_key_pem)
+                    with open(f"{userID}_public_key_{keyId}.pem", "wb") as f:
+                        f.write(public_key_pem)
+                return keyId
             else:
                 pass  # todo
             return None
         else:
             pass  # todo
             return None
+
+    def load_keys_from_directory(self, directory):
+        keys = {}
+        for file_name in os.listdir(directory):
+            if file_name.endswith(".pem"):
+                parts = file_name.split('_')
+                if len(parts) >= 3:
+                    owner_info = parts[0]
+                    key_type = parts[1]
+                    key_id = parts[3]
+                    file_path = os.path.join(directory, file_name)
+                    with open(file_path, "r") as f:
+                        key_pem = f.read()
+                        key = RSA.import_key(key_pem)
+                        match  key_type:
+                            case 'private':
+                                key = '('+str(key.d)+', '+str(key.n)+')'
+                            case 'public':
+                                key = '('+str(key.e)+', '+str(key.n)+')'
+                        key_info = {
+                            "type": key_type,
+                            "key": key,
+                            "key_id":key_id
+                        }
+
+                        if owner_info not in keys:
+                            keys[owner_info] = []
+
+                        keys[owner_info].append(key_info)
+        return keys
 
     def getPU(self, keyID: int):
         return self.publicKeyRing.getPU(keyID=keyID)

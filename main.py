@@ -12,9 +12,9 @@ users.append(gloginja)
 milena = User('jmilena3110@gmail.com', 'milena123', 'Milena')
 users.append(milena)
 
-gloginja_keyID = km.generateNewPairRSA(1024, gloginja.email, 'markog99')
+gloginja_keyID = km.generateNewPairRSA(1024, gloginja.email, 'markog99', 2)
 
-milena_keyID = km.generateNewPairRSA(1024, milena.email, 'milena123')
+milena_keyID = km.generateNewPairRSA(1024, milena.email, 'milena123', 2)
 
 msg = PGPMessage(datetime.datetime.now(), 'Milena sta radis')
 #msg.save(filePath='test.json', PR=km.getPR(gloginja_keyID, 'markog99'), PU=km.getPU(milena_keyID), isCompressed=True, algo=1, keyID=milena_keyID)
@@ -28,9 +28,5 @@ msg = PGPMessage()
 msg.load(filePath='test.json', PR=km.getPR(milena_keyID, 'milena123'), PU=km.getPU(gloginja_keyID))
 
 print(msg.message['data'])
-
-saveKey('test.pem','jmilena3110@gmail.com', km.getPU(milena_keyID))
-
-pu = loadKey('test.pem','jmilena3110@gmail.com')
-
+print(km.load_keys_from_directory('.'))
 pass
