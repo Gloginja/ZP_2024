@@ -17,11 +17,11 @@ gloginja_keyID = km.generateNewPairRSA(1024, gloginja.email, 'markog99')
 milena_keyID = km.generateNewPairRSA(1024, milena.email, 'milena123')
 
 msg = PGPMessage(datetime.datetime.now(), 'Milena sta radis')
-#msg.save(filePath='test.json', PR=km.getPR(gloginja_keyID, 'markog99'), PU=km.getPU(milena_keyID), isCompressed=True, algo=1, keyID=milena_keyID)
-#msg.save(filePath='test.json', PR=km.getPR(gloginja_keyID, 'markog99'), PU=km.getPU(milena_keyID), isCompressed=False, algo=2, keyID=milena_keyID)
-#msg.save(filePath='test.json', PR=None, PU=km.getPU(milena_keyID), isCompressed=False, algo=1, keyID=milena_keyID)
-msg.save(filePath='test.json', PR=km.getPR(gloginja_keyID, 'markog99'), PU=None, isCompressed=True, algo=2, keyID=milena_keyID)
-
+# msg.save(filePath='test.json', PR=km.getPR(gloginja_keyID, 'markog99'), PU=km.getPU(milena_keyID), isCompressed=True, algo=1, keyID=milena_keyID)
+# msg.save(filePath='test.json', PR=km.getPR(gloginja_keyID, 'markog99'), PU=km.getPU(milena_keyID), isCompressed=False, algo=2, keyID=milena_keyID)
+# msg.save(filePath='test.json', PR=None, PU=km.getPU(milena_keyID), isCompressed=False, algo=1, keyID=milena_keyID)
+msg.save(filePath='test.json', PR=km.getPR(gloginja_keyID, 'markog99'), PU=None, isCompressed=True, algo=2,
+         keyID=milena_keyID)
 
 msg = PGPMessage()
 
@@ -29,8 +29,9 @@ msg.load(filePath='test.json', PR=km.getPR(milena_keyID, 'milena123'), PU=km.get
 
 print(msg.message['data'])
 
-saveKey('test.pem','jmilena3110@gmail.com', km.getPU(milena_keyID))
+saveKey('test.pem', 'jmilena3110@gmail.com', km.getPR(milena_keyID, 'milena123'), 'milena123')
 
-pu = loadKey('test.pem','jmilena3110@gmail.com')
+pr = loadKey('test.pem', 'jmilena3110@gmail.com', 'milena123')
 
+pu = pr.public_key()
 pass

@@ -19,7 +19,7 @@ def loadKey(filepath: str, userID: str = None, password: str = None):
                 file = open(filepath, "r")
                 key_string = file.read()
                 file.close()
-                return RSA.import_key(extern_key=key_string, passphrase=user.password)
+                return RSA.import_key(extern_key=b64decode(key_string.encode('utf-8')), passphrase=user.password)
             else:
                 return None
         else:
@@ -30,16 +30,14 @@ def saveKey(filepath: str, userID: str, key: RSA.RsaKey, password: str = None):
     user = getUserDataByEmail(userID)
     if user is not None:
         if not key.has_private():
-            exp = key.export_key(format='PEM')
+            pu = key.export_key(format='PEM')
             with open(filepath, "w") as file:
-                file.write(b64encode(exp).decode('utf-8'))
+                file.write(b64encode(pu).decode('utf-8'))
         else:
             if password is not None and user.checkPassword(password):
                 pr = key.export_key(format='PEM', passphrase=user.password)
-                pu = key.public_key().export_key(format='PEM')
-                combined = pr + pu;
                 with open(filepath, "w") as file:
-                    file.write(b64encode(combined).decode('utf-8'))
+                    file.write(b64encode(pr).decode('utf-8'))
             else:
                 pass  # to do
 

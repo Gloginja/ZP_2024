@@ -2,12 +2,10 @@ from base64 import b64encode, b64decode
 from datetime import datetime
 import zlib
 
-from Cryptodome.PublicKey import RSA
 from RSAwrapper import RSA_Algo
 from RSAwrapper import RSA
 from TripleDES import TripleDES
 from AES128 import AES128
-from chardet import detect
 import json
 
 
