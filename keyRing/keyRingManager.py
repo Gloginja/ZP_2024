@@ -79,3 +79,13 @@ class KeyRingManager:
                 pass  # todo
         else:
             pass  # todo
+
+    def importKey_s(self, filepath: str, userID: str = None, password: str = None):
+        key = loadKey(filepath=filepath, userID=userID, password=password)
+        if key.has_private():
+            pu_key = key.public_key()
+            self.privateKeyRing.addToRing(timestamp=datetime.datetime.now(),PU=pu_key, PR=key, userID=userID)
+            self.publicKeyRing.addToRing(timestamp=datetime.datetime.now(), PU=pu_key, userID=userID)
+        else:
+            self.publicKeyRing.addToRing(timestamp=datetime.datetime.now(), PU=key, userID=userID)
+
