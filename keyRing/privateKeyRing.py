@@ -39,3 +39,10 @@ class PrivateKeyRing:
                 self.keyRing.remove(k)
                 return True
         return False
+
+    def getAllPrivateKeysByUserID(self, userID: str):
+        keys = []
+        for k in self.keyRing:
+            if k['userID'] == userID:
+                keys.append(k)
+        return keys

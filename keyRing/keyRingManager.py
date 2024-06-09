@@ -84,8 +84,13 @@ class KeyRingManager:
         key = loadKey(filepath=filepath, userID=userID, password=password)
         if key.has_private():
             pu_key = key.public_key()
-            self.privateKeyRing.addToRing(timestamp=datetime.datetime.now(),PU=pu_key, PR=key, userID=userID)
+            self.privateKeyRing.addToRing(timestamp=datetime.datetime.now(), PU=pu_key, PR=key, userID=userID)
             self.publicKeyRing.addToRing(timestamp=datetime.datetime.now(), PU=pu_key, userID=userID)
         else:
             self.publicKeyRing.addToRing(timestamp=datetime.datetime.now(), PU=key, userID=userID)
 
+    def getAllPrivateKeysByUserID(self, userID):
+        return self.privateKeyRing.getAllPrivateKeysByUserID(userID)
+
+    def getAllPublicKeysByUserID(self, userID):
+        return self.publicKeyRing.getAllPublicKeysByUserID(userID)

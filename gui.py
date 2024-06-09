@@ -28,6 +28,7 @@ class Ui_MainWindow(object):
         self.aesRadioButton = QtWidgets.QRadioButton(self.centralwidget)
         self.aesRadioButton.setGeometry(QtCore.QRect(150, 370, 95, 20))
         self.aesRadioButton.setObjectName("aesRadioButton")
+        self.aesRadioButton.setChecked(True)
         self.tripleDESRadioButton = QtWidgets.QRadioButton(self.centralwidget)
         self.tripleDESRadioButton.setGeometry(QtCore.QRect(260, 370, 95, 20))
         self.tripleDESRadioButton.setObjectName("tripleDESRadioButton")

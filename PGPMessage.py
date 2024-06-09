@@ -20,8 +20,7 @@ class PGPMessage:
         }
         self.PGPMessage = {}
 
-    def save(self, filePath: str, PU: RSA.RsaKey | None, PR: RSA.RsaKey | None, isCompressed: bool, algo: int,
-             keyID: int):
+    def save(self, filePath: str, PU: RSA.RsaKey | None, PR: RSA.RsaKey | None, isCompressed: bool, algo: int):
 
         self.message['timestamp'] = self.message['timestamp'].isoformat() if self.message[
                                                                                  'timestamp'] is not None else None
@@ -30,7 +29,7 @@ class PGPMessage:
             self.signature = {
                 'messageDigest': b64encode(RSA_Algo.sign(PR, self.message['data'].encode('utf-8'))).decode('utf-8'),
                 'timestamp': datetime.now().isoformat(),
-                'senderKeyID': keyID}
+                'senderKeyID': PR.n % 2 ** 64}
             self.operations['authentication'] = True
         if PU is not None:
             messageAndSignature = {

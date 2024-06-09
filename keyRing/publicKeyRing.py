@@ -18,9 +18,17 @@ class PublicKeyRing:
 
     def saveKey(self, keyID):
         pass
+
     def deleteKey(self, keyID: int, userID: str) -> bool:
         for k in self.keyRing:
             if k['keyID'] == keyID and k['userID'] == userID:
                 self.keyRing.remove(k)
                 return True
         return False
+
+    def getAllPublicKeysByUserID(self, userID: str):
+        keys = []
+        for k in self.keyRing:
+            if k['userID'] == userID:
+                keys.append(k)
+        return keys
