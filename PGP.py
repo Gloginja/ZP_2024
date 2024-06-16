@@ -15,9 +15,11 @@ class PGP:
         users.append(User(email=email, name=name, password=password))
         self.keyRingManager.generateNewPairRSA(keySize=keySize, userID=email, password=password)
 
-    def send(self, filepath: str, PR: RsaKey, PU: RsaKey, isCompressed: bool, algo: int, messageText: str):
+    def send(self, filepath: str, PR: RsaKey | None, PU: RsaKey | None, isCompressed: bool, algo: int, messageText: str):
         pgpMessage = PGPMessage(datetime.now(), messageText)
         pgpMessage.save(filePath=filepath, PR=PR, PU=PU, isCompressed=isCompressed, algo=algo)
 
-    def receive(self, ):
-        pass
+    def receive(self, message_data:  dict, krm: KeyRingManager, password=None):
+        pgpMessage = PGPMessage()
+        pgpMessage.load(message_data, krm, password)
+        return pgpMessage.message

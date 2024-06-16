@@ -8,6 +8,8 @@ from TripleDES import TripleDES
 from AES128 import AES128
 import json
 
+from keyRing.keyRingManager import KeyRingManager
+
 
 class PGPMessage:
     def __init__(self, timestamp: datetime = None, data: str = None):
@@ -73,15 +75,16 @@ class PGPMessage:
         with open(filePath, 'w') as f:
             json.dump(self.PGPMessage, f)
 
-    def load(self, filePath: str, PR: RSA.RsaKey, PU: RSA.RsaKey):
-        with open(filePath, 'r') as f:
-            self.PGPMessage = json.load(f)
+    def load(self, message_data: dict, krm: KeyRingManager,  password: str = None):
+        self.PGPMessage = message_data
         if self.PGPMessage['operations']['encryption'] != 0:
             self.PGPMessage['messageAndSignatureEncrypted'] = json.loads(
                 self.PGPMessage['messageAndSignatureEncrypted'])
             self.operations = self.PGPMessage['operations']
 
             temp = None
+
+            PR = krm.privateKeyRing.getPR(self.PGPMessage['recipientKeyID'], password)
 
             if self.operations['encryption'] == 1:
                 key = RSA_Algo.decrypt(PR, b64decode(self.PGPMessage['sessionKey'].encode('utf-8')))
@@ -100,12 +103,14 @@ class PGPMessage:
             else:
                 temp = json.loads(temp)
 
-            if temp['signature'] and not RSA_Algo.verify(PU, temp['message']['data'].encode('utf-8'),
+            if temp['signature'] and not RSA_Algo.verify(krm.publicKeyRing.getPU(temp['signature']['senderKeyID']),
+                                                         temp['message']['data'].encode('utf-8'),
                                                          b64decode(
                                                              temp['signature']['messageDigest'].encode('utf-8'))):
                 pass  # to do
             else:
                 self.message = temp['message']
+                self.message['timestamp'] = datetime.fromisoformat(self.message['timestamp'])
                 self.signature = temp['signature']
         elif self.PGPMessage['operations']['authentication']:
             if self.PGPMessage['operations']['compression']:
@@ -114,6 +119,8 @@ class PGPMessage:
             else:
                 self.message = self.PGPMessage['message']
             self.message['timestamp'] = datetime.fromisoformat(self.message['timestamp'])
+            self.signature = self.PGPMessage['signature']
+            PU = krm.publicKeyRing.getPU(self.signature['senderKeyID'])
             if not RSA_Algo.verify(PU, self.message['data'].encode('utf-8'),
                                    b64decode(self.PGPMessage['signature']['messageDigest'].encode('utf-8'))):
                 pass  # to do

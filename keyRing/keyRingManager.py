@@ -39,7 +39,7 @@ def saveKey(filepath: str, userID: str, key: RSA.RsaKey, password: str = None):
                 with open(filepath, "w") as file:
                     file.write(b64encode(pr).decode('utf-8'))
             else:
-                pass  # to do
+                return None
 
 
 class KeyRingManager:
@@ -82,12 +82,17 @@ class KeyRingManager:
 
     def importKey_s(self, filepath: str, userID: str = None, password: str = None):
         key = loadKey(filepath=filepath, userID=userID, password=password)
+        if key is None:
+            return None
+        if self.publicKeyRing.getPU(key.n % 2 ** 64) is not None or self.privateKeyRing.getPR(key.n % 2 ** 64, password) is not None:
+            return -1
         if key.has_private():
             pu_key = key.public_key()
             self.privateKeyRing.addToRing(timestamp=datetime.datetime.now(), PU=pu_key, PR=key, userID=userID)
             self.publicKeyRing.addToRing(timestamp=datetime.datetime.now(), PU=pu_key, userID=userID)
         else:
             self.publicKeyRing.addToRing(timestamp=datetime.datetime.now(), PU=key, userID=userID)
+        return key.n % 2 ** 64
 
     def getAllPrivateKeysByUserID(self, userID):
         return self.privateKeyRing.getAllPrivateKeysByUserID(userID)
