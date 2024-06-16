@@ -30,7 +30,7 @@ def displayPublicKeysList(main_ui: Ui_MainWindow, pgp_prot: PGP):
 
 
 def sendWithPR(passwordDialog: Ui_Dialog_Password, pgp_prot: PGP, filePath: str, PU: RsaKey | None, isCompressed: bool,
-               sym_algo: int, message: str, keyID: int):
+               sym_algo: int, message: str, keyID: int, main_ui: Ui_MainWindow):
     password = passwordDialog.passwordInput.text()
     passwordDialog.passwordInput.clear()
     PR = pgp_prot.keyRingManager.getPR(keyID, password)
@@ -43,6 +43,7 @@ def sendWithPR(passwordDialog: Ui_Dialog_Password, pgp_prot: PGP, filePath: str,
         msg.exec_()
         return
     pgp_prot.send(filePath, PR, PU, isCompressed, sym_algo, message)
+    main_ui.textEdit.clear()
 
 
 def receiveWithPR(passwordDialog: Ui_Dialog_Password, main_ui: Ui_MainWindow, pgp_prot: PGP, message_data: dict):
@@ -72,7 +73,7 @@ def send(main_ui: Ui_MainWindow, pgp_prot: PGP):
                                                                          main_ui.compressCheckbox.isChecked(),
                                                                          2 if main_ui.aesRadioButton.isChecked() else 1,
                                                                          main_ui.textEdit.toPlainText(),
-                                                                         int(privateKey.text())))
+                                                                         int(privateKey.text()), main_ui))
             passwordDialog.keyid.setText(f"Key ID {privateKey.text()}")
             passwordDialog.user.setText(f"for user {main_ui.sendFromCombo.currentText()}")
             passwordDialog.Dialog.show()
@@ -81,6 +82,7 @@ def send(main_ui: Ui_MainWindow, pgp_prot: PGP):
             sym_algo = 2 if main_ui.aesRadioButton.isChecked() else 1
             pgp_prot.send(filePath, None, PU, main_ui.compressCheckbox.isChecked(), sym_algo,
                           main_ui.textEdit.toPlainText())
+            main_ui.textEdit.clear()
     else:
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -139,6 +141,7 @@ def checkPasswordAndSaveKey(pgp_prot: PGP, passwordDialog: Ui_Dialog_Password, f
         return
     else:
         saveKey(filePath, key_data['userID'], key, passwordDialog.passwordInput.text())
+
 
 def exportKey(main_ui: Ui_MainWindow, pgp_prot: PGP):
     privateKeyID = main_ui.privateKeysList.currentItem()

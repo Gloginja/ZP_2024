@@ -1,3 +1,6 @@
+import base64
+import hashlib
+
 from keyRing.privateKeyRing import PrivateKeyRing
 from keyRing.publicKeyRing import PublicKeyRing
 from user import getUserDataByEmail
@@ -6,24 +9,17 @@ import datetime
 from base64 import b64encode, b64decode
 
 
-def loadKey(filepath: str, userID: str = None, password: str = None):
-    if userID is None or password is None:
+def loadKey(filepath: str, password: str = None):
+    if password is None:
         file = open(filepath, "r")
         key_string = file.read()
         file.close()
         return RSA.import_key(b64decode(key_string))
     else:
-        if userID is not None:
-            user = getUserDataByEmail(userID)
-            if user is not None and password is not None and user.checkPassword(password):
-                file = open(filepath, "r")
-                key_string = file.read()
-                file.close()
-                return RSA.import_key(extern_key=b64decode(key_string.encode('utf-8')), passphrase=user.password)
-            else:
-                return None
-        else:
-            return None
+        file = open(filepath, "r")
+        key_string = file.read()
+        file.close()
+        return RSA.import_key(extern_key=b64decode(key_string.encode('utf-8')), passphrase=hashlib.sha1(base64.b64encode(password.encode('ascii'))).hexdigest())
 
 
 def saveKey(filepath: str, userID: str, key: RSA.RsaKey, password: str = None):
@@ -81,10 +77,11 @@ class KeyRingManager:
             pass  # todo
 
     def importKey_s(self, filepath: str, userID: str = None, password: str = None):
-        key = loadKey(filepath=filepath, userID=userID, password=password)
+        key = loadKey(filepath=filepath, password=password)
         if key is None:
             return None
-        if self.publicKeyRing.getPU(key.n % 2 ** 64) is not None or self.privateKeyRing.getPR(key.n % 2 ** 64, password) is not None:
+        if self.publicKeyRing.getPU(key.n % 2 ** 64) is not None or self.privateKeyRing.getPR(key.n % 2 ** 64,
+                                                                                              password) is not None:
             return -1
         if key.has_private():
             pu_key = key.public_key()
